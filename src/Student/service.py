@@ -1,6 +1,7 @@
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.Student.models import Student
+from src.auth.models import User
 import uuid
 
 
@@ -101,3 +102,9 @@ async def delete_student(session: AsyncSession, student_id: uuid.UUID):
     await session.delete(student)
     await session.commit()
     return student
+
+async def get_user_by_email(session: AsyncSession, email: str):
+    result = await session.execute(
+        select(User).where(User.email == email)
+    )
+    return result.scalar_one_or_none()

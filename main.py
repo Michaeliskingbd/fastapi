@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from src.Student.routes import router as student_router
+from src.auth.routers import router as auth_router
 from contextlib import asynccontextmanager
 from src.db.main import init_db
 
@@ -20,8 +21,9 @@ app = FastAPI(
     lifespan=life_span
 )
 
-app.include_router(student_router,prefix=f"/api/{API_VERSION}/students",tags=["Students"]
-)
+app.include_router(student_router,prefix=f"/api/{API_VERSION}/students",tags=["Students"])
+                   
+app.include_router(auth_router,prefix=f"/api/{API_VERSION}/auth",tags=["Auth"]               )
 
 
 
