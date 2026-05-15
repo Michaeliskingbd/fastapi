@@ -96,7 +96,7 @@ async def logout(db: AsyncSession, refresh_token: str):
     db_token = result.scalar_one_or_none()
 
     if not db_token:
-        return  # don't leak
+        return  # don't leak info
 
     db_token.is_revoked = True
     await db.commit()
