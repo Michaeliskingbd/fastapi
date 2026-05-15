@@ -3,6 +3,11 @@ from src.Student.routes import router as student_router
 from src.auth.routers import router as auth_router
 from contextlib import asynccontextmanager
 from src.db.main import init_db
+from src.auth.middleware import JWTAuthMiddleware
+
+
+
+
 
 
 @asynccontextmanager
@@ -26,7 +31,7 @@ app.include_router(student_router,prefix=f"/api/{API_VERSION}/students",tags=["S
 app.include_router(auth_router,prefix=f"/api/{API_VERSION}/auth",tags=["Auth"]               )
 
 
-
+app.add_middleware(JWTAuthMiddleware)
 
 # postgresql://postgres:123456789@localhost:5432/fastapi_db
 

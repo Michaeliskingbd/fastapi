@@ -72,7 +72,7 @@ async def login_user(db: AsyncSession, email: str, password: str):
     db_token = RefreshToken(
         user_id=user.id,
         token_hash=token_hash,
-        expires_at=datetime.now(datetime.timezone.utc) + timedelta(days=REFRESH_DAYS)
+        expires_at = datetime.utcnow() + timedelta(days=REFRESH_DAYS)
     )
 
     db.add(db_token)
@@ -100,4 +100,66 @@ async def logout(db: AsyncSession, refresh_token: str):
 
     db_token.is_revoked = True
     await db.commit()
+
+
+    from sqlalchemy import select
+from src.auth.security import (
+    hash_token,
+    generate_refresh_token
+)
+
+
+async def refresh_access_token(
+    db: AsyncSession,
+    refresh_token: str
+):
+
+    token_hash = hash_token(refresh_token)
+
+    result = await db.execute(
+        select(RefreshToken).where(
+            RefreshToken.token_hash == token_hash
+        )
+    )
+
+    db_token = result.scalar_one_or_none()
+
+    if not db_token:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    if db_token.is_revoked:
+        raise HTTPException(status_code=401, detail="Refresh token revoked")
+
+    if db_token.expires_at < datetime.now(datetime.timezone.utc):
+        raise HTTPException(status_code=401, detail="Refresh token expired")
+
+    # revoke old token (rotation)
+    db_token.is_revoked = True
+
+    # create new access token
+    access_token = create_access_token({
+        "sub": str(db_token.user_id)
+    })
+
+    # create new refresh token
+    new_refresh = generate_refresh_token()
+
+    new_db_token = RefreshToken(
+        user_id=db_token.user_id,
+        token_hash=hash_token(new_refresh),
+        expires_at = datetime.utcnow() + timedelta(days=REFRESH_DAYS),
+        
+    )
+
+    db.add(new_db_token)
+
+    await db.commit()
+
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh
+    }
+
+
+
 

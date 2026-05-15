@@ -51,6 +51,7 @@ class RefreshToken(SQLModel, table=True):
     created_at: datetime = Field(
         sa_column=Column(pg.TIMESTAMP, default=datetime.now)
     )
+    
 
     replaced_by: str | None = Field(default=None)
 

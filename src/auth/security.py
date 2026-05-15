@@ -24,6 +24,8 @@ security = HTTPBearer()
 #Till this point
 
 
+
+
 pwd_context = CryptContext(
     schemes=["argon2"],
     deprecated="auto"
@@ -127,3 +129,5 @@ def generate_refresh_token() -> str:
 
 def hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+
