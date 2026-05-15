@@ -120,7 +120,7 @@ async def get_current_user(
 import secrets
 import hashlib
 
-REFRESH_TOKEN_BYTES = 64  # 512-bit token
+REFRESH_TOKEN_BYTES = 64  # 512-bit token.
 
 
 def generate_refresh_token() -> str:
