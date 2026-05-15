@@ -85,7 +85,7 @@ async def login_user(db: AsyncSession, email: str, password: str):
 
 
 
-#Logout User
+#Logout_User
 async def logout(db: AsyncSession, refresh_token: str):
 
     token_hash = hash_token(refresh_token)
